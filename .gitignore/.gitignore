@@ -1,0 +1,1460 @@
+Controle_Datas:
+load 
+fk_processo,
+nr_processo,
+nr_ref_cliente,
+nm_cliente,
+nm_servico,
+nm_canal,
+nm_modal,
+
+IF(isnull(nm_urf_despacho),'nulo','ok') AS urfdespachonulo,
+nm_urf_despacho,
+IF(isnull(nm_urf_entrada),'nulo','ok') AS urfentradanulo,
+nm_urf_entrada,
+year(abertura) AS ano_abertura, 
+month(abertura) AS mes_abertura, 
+day(abertura) AS dia_abertura, 
+
+abertura,
+solicitacao,
+eta,
+atracacao,
+desova,
+bl_orig,
+redest_container,
+lib_mapa,
+presenca,
+recebimento_numerario,
+registrodi,
+desembaraco,
+receb_danf,
+carregamento,
+entrega,
+encerramento,
+faturamento,
+nr_awb_bl,
+registro_dta,
+liberacao_dta,
+madeira_cond,
+madeira_lib,
+pre_encerramento,
+rec_documentos,
+
+
+status_solicitacao,
+status_eta,
+status_atracacao,
+status_desova,
+status_bl_orig,
+status_redest_container,
+status_lib_mapa,
+status_presenca,
+status_recebimento_numerario,
+status_registrodi,
+status_desembaraco,
+status_receb_danf,
+status_carregamento,
+status_entrega,
+status_encerramento,
+status_faturamento,
+status_pre_encerramento,
+status_registro_dta,
+status_liberacao_dta,
+status_madeira_liberada,
+status_rec_documento,
+fat_notfat,
+tp_estufagem
+
+
+
+;
+sql
+SELECT
+QUERY_SEGUNDA_PARTE.fk_processo,
+
+QUERY_SEGUNDA_PARTE.nr_processo,
+QUERY_SEGUNDA_PARTE.nr_ref_cliente,
+QUERY_SEGUNDA_PARTE.nm_cliente,
+QUERY_SEGUNDA_PARTE.nm_servico,
+QUERY_SEGUNDA_PARTE.nm_canal,
+QUERY_SEGUNDA_PARTE.nm_modal,
+QUERY_SEGUNDA_PARTE.nm_urf_despacho,
+QUERY_SEGUNDA_PARTE.nm_urf_entrada,
+QUERY_SEGUNDA_PARTE.tp_estufagem,
+
+QUERY_SEGUNDA_PARTE.abertura,
+QUERY_SEGUNDA_PARTE.solicitacao,
+QUERY_SEGUNDA_PARTE.eta,
+QUERY_SEGUNDA_PARTE.atracacao,
+QUERY_SEGUNDA_PARTE.desova,
+QUERY_SEGUNDA_PARTE.bl_orig,
+QUERY_SEGUNDA_PARTE.redest_container,
+QUERY_SEGUNDA_PARTE.lib_mapa,
+QUERY_SEGUNDA_PARTE.presenca,
+QUERY_SEGUNDA_PARTE.recebimento_numerario,
+QUERY_SEGUNDA_PARTE.registrodi,
+QUERY_SEGUNDA_PARTE.desembaraco,
+QUERY_SEGUNDA_PARTE.receb_danf,
+QUERY_SEGUNDA_PARTE.carregamento,
+QUERY_SEGUNDA_PARTE.entrega,
+QUERY_SEGUNDA_PARTE.encerramento,
+QUERY_SEGUNDA_PARTE.faturamento,
+QUERY_SEGUNDA_PARTE.nr_awb_bl,
+QUERY_SEGUNDA_PARTE.registro_dta,
+QUERY_SEGUNDA_PARTE.liberacao_dta,
+QUERY_SEGUNDA_PARTE.madeira_cond,
+QUERY_SEGUNDA_PARTE.madeira_lib,
+QUERY_SEGUNDA_PARTE.pre_encerramento,
+QUERY_SEGUNDA_PARTE.rec_documentos,
+
+(CASE WHEN QUERY_SEGUNDA_PARTE.faturamento IS NULL  THEN 'Não Faturado' ELSE  'Faturado' END) AS fat_notfat,
+
+
+QUERY_SEGUNDA_PARTE.status_solicitacao,
+QUERY_SEGUNDA_PARTE.status_eta,
+QUERY_SEGUNDA_PARTE.status_atracacao,
+QUERY_SEGUNDA_PARTE.status_desova,
+QUERY_SEGUNDA_PARTE.status_bl_orig,
+QUERY_SEGUNDA_PARTE.status_redest_container,
+QUERY_SEGUNDA_PARTE.status_lib_mapa,
+QUERY_SEGUNDA_PARTE.status_presenca,
+QUERY_SEGUNDA_PARTE.status_recebimento_numerario,
+QUERY_SEGUNDA_PARTE.status_registrodi,
+QUERY_SEGUNDA_PARTE.status_desembaraco,
+QUERY_SEGUNDA_PARTE.status_receb_danf,
+QUERY_SEGUNDA_PARTE.status_carregamento,
+QUERY_SEGUNDA_PARTE.status_entrega,
+QUERY_SEGUNDA_PARTE.status_encerramento,
+QUERY_SEGUNDA_PARTE.status_faturamento,
+QUERY_SEGUNDA_PARTE.status_pre_encerramento,
+QUERY_SEGUNDA_PARTE.status_registro_dta,
+QUERY_SEGUNDA_PARTE.status_liberacao_dta,
+QUERY_SEGUNDA_PARTE.status_madeira_liberada,
+QUERY_SEGUNDA_PARTE.status_rec_documento
+
+
+
+
+FROM (
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+SELECT
+
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.SOLICITACAO IS NULL THEN
+			(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%COMEX%' THEN NULL
+					ELSE									   
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+										(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN NULL
+										     ELSE
+													  (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ABERTURA <= '2' THEN '1SOLICITACAO' -- Verde  
+															WHEN QUERY_PRIMEIRA_PARTE.DIA_ABERTURA <= '5' THEN '2SOLICITACAO' -- Amarelo 
+															WHEN QUERY_PRIMEIRA_PARTE.DIA_ABERTURA >= '6' THEN '3SOLICITACAO' -- Vermelho 
+															ELSE NULL -- Nulo  
+														END)		
+										END	)			
+							ELSE NULL END)
+			END)
+	ELSE NULL
+END	) AS STATUS_SOLICITACAO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ETA IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO <= '1' THEN '1ETA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO <= '3' THEN '2ETA' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO >= '4' THEN '3ETA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END )
+							ELSE NULL END)
+	ELSE NULL 
+END	) AS STATUS_ETA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ATRACACAO IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '1' THEN '1ATRACACAO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '3' THEN '2ATRACACAO' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '4' THEN '3ATRACACAO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END )
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_ATRACACAO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.DESOVA IS NULL THEN
+      (CASE WHEN QUERY_PRIMEIRA_PARTE.TP_ESTUFAGEM = 'FCL' THEN NULL 
+           ELSE             (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',		   
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '3' THEN '1DESOVA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '4' THEN '2DESOVA' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '5' THEN '3DESOVA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END) 
+							ELSE NULL END)	
+	   END)													
+	ELSE NULL
+END	) AS STATUS_DESOVA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.BL_ORIG IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',							
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '1' THEN '1BL_ORIG' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '3' THEN '2BL_ORIG' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '4' THEN '3BL_ORIG' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_BL_ORIG,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.MADEIRA_LIB IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',							
+																		   'IMP. NORMAL - AÉREA (sem DTA)') THEN
+									(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN 
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_MADEIRA_COND <= '5' THEN '1MADEIRA_LIBERADA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_MADEIRA_COND <= '6' THEN '2MADEIRA_LIBERADA' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_MADEIRA_COND >= '7' THEN '3MADEIRA_LIBERADA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+									      ELSE NULL END)
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_MADEIRA_LIBERADA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.REDEST_CONTAINER IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',							
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+									(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN NULL
+									      ELSE
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '-3' THEN '1REDEST_CONTAINER' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '-2' THEN '2REDEST_CONTAINER' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '-1' THEN '3REDEST_CONTAINER' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+									END)
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_REDEST_CONTAINER,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.REC_DOCUMENTOS IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. MARITIMA (DTA1)',
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '1' THEN '1REC_DOCUMENTO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '3' THEN '2REC_DOCUMENTO' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '4' THEN '3REC_DOCUMENTO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END )
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_REC_DOCUMENTO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.LIB_MAPA IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+									(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN NULL
+									      ELSE
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '3' THEN '1LIB_MAPA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '4' THEN '2LIB_MAPA' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '5' THEN '3LIB_MAPA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                         END) 
+									END)
+							ELSE NULL END)														 
+	ELSE NULL
+END	) AS STATUS_LIB_MAPA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.PRESENCA IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)', 
+																		   'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '3' THEN '1PRESENCA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '4' THEN '2PRESENCA' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '5' THEN '3PRESENCA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)  
+								  WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '1' THEN '1PRESENCA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '2' THEN '3PRESENCA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+								  WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. MARITIMA (DTA1)', 
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_LIBERACAO_DTA <= '1' THEN '1PRESENCA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_LIBERACAO_DTA <= '2' THEN '2PRESENCA' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_LIBERACAO_DTA >= '3' THEN '3PRESENCA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END) 																		   
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_PRESENCA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.RECEBIMENTO_NUMERARIO IS NULL THEN
+			(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%COMEX%' THEN NULL
+					ELSE
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		   'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		   
+																		   'IMP. MARITIMA (DTA1)',
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+											(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN NULL
+												  ELSE
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '1' THEN '1RECEBIMENTO_NUMERARIO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '2' THEN '2RECEBIMENTO_NUMERARIO' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA >= '3' THEN '3RECEBIMENTO_NUMERARIO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                         END )
+											END)
+								  WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - RODOVIARIA') THEN NULL		
+							ELSE NULL END)		
+			END)
+	ELSE NULL
+END	) AS STATUS_RECEBIMENTO_NUMERARIO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.REGISTRO_DTA IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. MARITIMA (DTA1)',
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '1' THEN '1REGISTRO_DTA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '2' THEN '3REGISTRO_DTA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                         END )	
+							ELSE NULL END)														 
+	ELSE NULL
+END	) AS STATUS_REGISTRO_DTA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.LIBERACAO_DTA IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. MARITIMA (DTA1)',
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_REGISTRO_DTA <= '1' THEN '1LIBERACAO_DTA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_REGISTRO_DTA >= '2' THEN '3LIBERACAO_DTA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                         END )	
+							ELSE NULL END)														 
+	ELSE NULL
+END	) AS STATUS_LIBERACAO_DTA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.REGISTRODI IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		   'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '1' THEN '1REGISTRODI' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '2' THEN '2REGISTRODI' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA >= '3' THEN '3REGISTRODI' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+								  WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. MARITIMA (DTA1)',
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT',
+																		   'IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '1' THEN '1REGISTRODI' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA >= '2' THEN '3REGISTRODI' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)														
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_REGISTRODI,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.DESEMBARACO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_REGISTRODI <= '1' THEN '1DESEMBARACO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_REGISTRODI >= '2' THEN '3DESEMBARACO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END														
+	ELSE NULL
+END	) AS STATUS_DESEMBARACO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.RECEB_DANF IS NULL THEN
+                            (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO <= '1' THEN '1RECEB_DANF' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO <= '2' THEN '2RECEB_DANF' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO >= '3' THEN '3RECEB_DANF' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+								  WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. MARITIMA (DTA1)',
+																		   'IMP. AEREA (COM DTA)',
+																		   'IMP. MARITIMA (DTA1) COMEXPORT',
+																		   'IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO <= '1' THEN '1RECEB_DANF' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO >= '2' THEN '3RECEB_DANF' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)													
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_RECEB_DANF,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.CARREGAMENTO IS NULL THEN
+                           (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_RECEB_DANF <= '1' THEN '1CARREGAMENTO' -- Verde   
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_RECEB_DANF >= '2' THEN '3CARREGAMENTO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END) 
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_CARREGAMENTO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ENTREGA IS NULL THEN
+                           (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_CARREGAMENTO <= '1' THEN '1ENTREGA' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_CARREGAMENTO >= '2' THEN '3ENTREGA' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+							ELSE NULL END)													
+	ELSE NULL
+END	) AS STATUS_ENTREGA,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.PRE_ENCERRAMENTO IS NULL THEN
+                           (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+											(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN NULL
+												  ELSE
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA <= '1' THEN '1PRE_ENCERRAMENTO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA <= '2' THEN '2PRE_ENCERRAMENTO' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA >= '3' THEN '3PRE_ENCERRAMENTO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+											END)
+							ELSE NULL END)													
+	ELSE NULL
+END	) AS STATUS_PRE_ENCERRAMENTO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ENCERRAMENTO IS NULL THEN
+                          (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+											(CASE WHEN QUERY_PRIMEIRA_PARTE.NM_CLIENTE LIKE '%VOLVO%' THEN 
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA <= '1' THEN '1ENCERRAMENTO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA <= '2' THEN '2ENCERRAMENTO' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA >= '3' THEN '3ENCERRAMENTO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+												  ELSE
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_PRE_ENCERRAMENTO <= '1' THEN '1ENCERRAMENTO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRE_ENCERRAMENTO <= '2' THEN '2ENCERRAMENTO' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_PRE_ENCERRAMENTO >= '3' THEN '3ENCERRAMENTO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)
+											END)
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_ENCERRAMENTO,
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.FATURAMENTO IS NULL THEN
+                           (CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)',
+																		  'IMP. NORMAL - AÉREA (sem DTA)',
+																		  'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+																		  'IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',																		  
+																		  'IMP. MARITIMA (DTA1)',
+																		  'IMP. AEREA (COM DTA)',
+																		  'IMP. MARITIMA (DTA1) COMEXPORT',
+																		  'IMP. NORMAL - RODOVIARIA') THEN
+                                                       (CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ENCERRAMENTO <= '1' THEN '1FATURAMENTO' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ENCERRAMENTO >= '2' THEN '3FATURAMENTO' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END)														
+							ELSE NULL END)														
+	ELSE NULL
+END	) AS STATUS_FATURAMENTO,
+
+QUERY_PRIMEIRA_PARTE.NR_PROCESSO,
+QUERY_PRIMEIRA_PARTE.TP_ESTUFAGEM,
+QUERY_PRIMEIRA_PARTE.NR_REF_CLIENTE,
+QUERY_PRIMEIRA_PARTE.NM_CLIENTE,
+QUERY_PRIMEIRA_PARTE.NM_SERVICO,
+QUERY_PRIMEIRA_PARTE.NM_CANAL,
+QUERY_PRIMEIRA_PARTE.NM_MODAL,
+QUERY_PRIMEIRA_PARTE.NM_URF_DESPACHO,
+QUERY_PRIMEIRA_PARTE.NM_URF_ENTRADA,
+QUERY_PRIMEIRA_PARTE.NR_AWB_BL,
+
+QUERY_PRIMEIRA_PARTE.ABERTURA,
+QUERY_PRIMEIRA_PARTE.SOLICITACAO,
+QUERY_PRIMEIRA_PARTE.ETA,
+QUERY_PRIMEIRA_PARTE.ATRACACAO,
+QUERY_PRIMEIRA_PARTE.DESOVA,
+QUERY_PRIMEIRA_PARTE.BL_ORIG,
+QUERY_PRIMEIRA_PARTE.MADEIRA_COND,
+QUERY_PRIMEIRA_PARTE.MADEIRA_LIB,
+QUERY_PRIMEIRA_PARTE.REDEST_CONTAINER,
+QUERY_PRIMEIRA_PARTE.LIB_MAPA,
+QUERY_PRIMEIRA_PARTE.PRESENCA,
+QUERY_PRIMEIRA_PARTE.RECEBIMENTO_NUMERARIO,
+QUERY_PRIMEIRA_PARTE.REGISTRO_DTA,
+QUERY_PRIMEIRA_PARTE.LIBERACAO_DTA,
+QUERY_PRIMEIRA_PARTE.REGISTRODI,
+QUERY_PRIMEIRA_PARTE.DESEMBARACO,
+QUERY_PRIMEIRA_PARTE.RECEB_DANF,
+QUERY_PRIMEIRA_PARTE.CARREGAMENTO,
+QUERY_PRIMEIRA_PARTE.ENTREGA,
+QUERY_PRIMEIRA_PARTE.PRE_ENCERRAMENTO,
+QUERY_PRIMEIRA_PARTE.ENCERRAMENTO,
+QUERY_PRIMEIRA_PARTE.FATURAMENTO,
+QUERY_PRIMEIRA_PARTE.REC_DOCUMENTOS
+
+
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NR_PROCESSO = '.' THEN NULL ELSE DIM_PROCESSO.NR_PROCESSO END) AS NR_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NR_REF_CLIENTE = '.' THEN NULL ELSE DIM_PROCESSO.NR_REF_CLIENTE END) AS NR_REF_CLIENTE,
+(CASE WHEN DIM_PROCESSO.NM_CLIENTE = '.' THEN NULL ELSE DIM_PROCESSO.NM_CLIENTE END) AS NM_CLIENTE,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+(CASE WHEN DIM_PROCESSO.NM_CANAL = '.' THEN NULL ELSE DIM_PROCESSO.NM_CANAL END) AS NM_CANAL,
+(CASE WHEN DIM_PROCESSO.NM_MODAL = '.' THEN NULL ELSE DIM_PROCESSO.NM_MODAL END) AS NM_MODAL,
+(CASE WHEN DIM_PROCESSO.NM_URF_DESPACHO = '.' THEN NULL ELSE DIM_PROCESSO.NM_URF_DESPACHO END) AS NM_URF_DESPACHO,
+(CASE WHEN DIM_PROCESSO.NM_URF_ENTRADA = '.' THEN NULL ELSE DIM_PROCESSO.NM_URF_ENTRADA END) AS NM_URF_ENTRADA,
+(CASE WHEN DIM_PROCESSO.TP_ESTUFAGEM = '.' THEN NULL ELSE DIM_PROCESSO.TP_ESTUFAGEM END) AS TP_ESTUFAGEM,
+(CASE WHEN DIM_PROCESSO.NR_AWB_BL = '.' THEN NULL ELSE DIM_PROCESSO.NR_AWB_BL END) AS NR_AWB_BL,
+
+
+DATEDIFF(DAY, (CASE WHEN ABERTURA.DATA = '1999-01-01' THEN NULL ELSE ABERTURA.DATA END), GETDATE()) AS DIA_ABERTURA,
+DATEDIFF(DAY, (CASE WHEN SOLICITACAO.DATA = '1999-01-01' THEN NULL ELSE SOLICITACAO.DATA END), GETDATE()) AS DIA_SOLICITACAO,
+DATEDIFF(DAY, (CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END), GETDATE()) AS DIA_ETA,
+DATEDIFF(DAY, (CASE WHEN ATRACACAO.DATA = '1999-01-01' THEN NULL ELSE ATRACACAO.DATA END), GETDATE()) AS DIA_ATRACACAO,
+DATEDIFF(DAY, (CASE WHEN DESOVA.DATA = '1999-01-01' THEN NULL ELSE DESOVA.DATA END), GETDATE()) AS DIA_DESOVA,
+DATEDIFF(DAY, (CASE WHEN RECEBBLORIG.DATA = '1999-01-01' THEN NULL ELSE RECEBBLORIG.DATA END), GETDATE()) AS DIA_BL_ORIG,
+DATEDIFF(DAY, (CASE WHEN MADEIRA_COND.DATA = '1999-01-01' THEN NULL ELSE MADEIRA_COND.DATA END), GETDATE()) AS DIA_MADEIRA_COND,
+DATEDIFF(DAY, (CASE WHEN MADEIRA_LIB.DATA = '1999-01-01' THEN NULL ELSE MADEIRA_LIB.DATA END), GETDATE()) AS DIA_MADEIRA_LIB,
+DATEDIFF(DAY, (CASE WHEN REDESTCONTAINER.DATA = '1999-01-01' THEN NULL ELSE REDESTCONTAINER.DATA END), GETDATE()) AS DIA_REDEST_CONTAINER,
+DATEDIFF(DAY, (CASE WHEN LIBMAPA.DATA = '1999-01-01' THEN NULL ELSE LIBMAPA.DATA END), GETDATE()) AS DIA_LIB_MAPA,
+DATEDIFF(DAY, (CASE WHEN PRESENCA.DATA = '1999-01-01' THEN NULL ELSE PRESENCA.DATA END), GETDATE()) AS DIA_PRESENCA,
+DATEDIFF(DAY, (CASE WHEN RECEBIMENTONUM.DATA = '1999-01-01' THEN NULL ELSE RECEBIMENTONUM.DATA END), GETDATE()) AS DIA_RECEBIMENTO_NUMERARIO,
+DATEDIFF(DAY, (CASE WHEN REGISTRODTA.DATA = '1999-01-01' THEN NULL ELSE REGISTRODTA.DATA END), GETDATE()) AS DIA_REGISTRO_DTA,
+DATEDIFF(DAY, (CASE WHEN LIBERACAODTA.DATA = '1999-01-01' THEN NULL ELSE LIBERACAODTA.DATA END), GETDATE()) AS DIA_LIBERACAO_DTA,
+DATEDIFF(DAY, (CASE WHEN REGISTRODI.DATA = '1999-01-01' THEN NULL ELSE REGISTRODI.DATA END), GETDATE()) AS DIA_REGISTRODI,
+DATEDIFF(DAY, (CASE WHEN DESEMBARACO.DATA = '1999-01-01' THEN NULL ELSE DESEMBARACO.DATA END), GETDATE()) AS DIA_DESEMBARACO,
+DATEDIFF(DAY, (CASE WHEN RECEBDANF.DATA = '1999-01-01' THEN NULL ELSE RECEBDANF.DATA END), GETDATE()) AS DIA_RECEB_DANF,
+DATEDIFF(DAY, (CASE WHEN CARREGAMENTO.DATA = '1999-01-01' THEN NULL ELSE CARREGAMENTO.DATA END), GETDATE()) AS DIA_CARREGAMENTO,
+DATEDIFF(DAY, (CASE WHEN ENTREGA.DATA = '1999-01-01' THEN NULL ELSE ENTREGA.DATA END), GETDATE()) AS DIA_ENTREGA,
+DATEDIFF(DAY, (CASE WHEN PRE_ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE PRE_ENCERRAMENTO.DATA END), GETDATE()) AS DIA_PRE_ENCERRAMENTO,
+DATEDIFF(DAY, (CASE WHEN ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE ENCERRAMENTO.DATA END), GETDATE()) AS DIA_ENCERRAMENTO,
+DATEDIFF(DAY, (CASE WHEN FATURAMENTO.DATA = '1999-01-01' THEN NULL ELSE FATURAMENTO.DATA END), GETDATE()) AS DIA_FATURAMENTO,
+DATEDIFF(DAY, (CASE WHEN REC_DOCUMENTOS.DATA = '1999-01-01' THEN NULL ELSE REC_DOCUMENTOS.DATA END), GETDATE()) AS DIA_REC_DOCUMENTOS,
+
+(CASE WHEN ABERTURA.DATA = '1999-01-01' THEN NULL ELSE ABERTURA.DATA END) AS ABERTURA,
+(CASE WHEN SOLICITACAO.DATA = '1999-01-01' THEN NULL ELSE SOLICITACAO.DATA END) AS SOLICITACAO,
+(CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END) AS ETA,
+(CASE WHEN ATRACACAO.DATA = '1999-01-01' THEN NULL ELSE ATRACACAO.DATA END) AS ATRACACAO,
+(CASE WHEN DESOVA.DATA = '1999-01-01' THEN NULL ELSE DESOVA.DATA END) AS DESOVA,
+(CASE WHEN RECEBBLORIG.DATA = '1999-01-01' THEN NULL ELSE RECEBBLORIG.DATA END) AS BL_ORIG,
+(CASE WHEN MADEIRA_COND.DATA = '1999-01-01' THEN NULL ELSE MADEIRA_COND.DATA END) AS MADEIRA_COND,
+(CASE WHEN MADEIRA_LIB.DATA = '1999-01-01' THEN NULL ELSE MADEIRA_LIB.DATA END) AS MADEIRA_LIB,
+(CASE WHEN REDESTCONTAINER.DATA = '1999-01-01' THEN NULL ELSE REDESTCONTAINER.DATA END) AS REDEST_CONTAINER,
+(CASE WHEN LIBMAPA.DATA = '1999-01-01' THEN NULL ELSE LIBMAPA.DATA END) AS LIB_MAPA,
+(CASE WHEN PRESENCA.DATA = '1999-01-01' THEN NULL ELSE PRESENCA.DATA END) AS PRESENCA,
+(CASE WHEN RECEBIMENTONUM.DATA = '1999-01-01' THEN NULL ELSE RECEBIMENTONUM.DATA END) AS RECEBIMENTO_NUMERARIO,
+(CASE WHEN REGISTRODTA.DATA = '1999-01-01' THEN NULL ELSE REGISTRODTA.DATA END) AS REGISTRO_DTA,
+(CASE WHEN LIBERACAODTA.DATA = '1999-01-01' THEN NULL ELSE LIBERACAODTA.DATA END) AS LIBERACAO_DTA,
+(CASE WHEN REGISTRODI.DATA = '1999-01-01' THEN NULL ELSE REGISTRODI.DATA END) AS REGISTRODI,
+(CASE WHEN DESEMBARACO.DATA = '1999-01-01' THEN NULL ELSE DESEMBARACO.DATA END) AS DESEMBARACO,
+(CASE WHEN RECEBDANF.DATA = '1999-01-01' THEN NULL ELSE RECEBDANF.DATA END) AS RECEB_DANF,
+(CASE WHEN CARREGAMENTO.DATA = '1999-01-01' THEN NULL ELSE CARREGAMENTO.DATA END) AS CARREGAMENTO,
+(CASE WHEN ENTREGA.DATA = '1999-01-01' THEN NULL ELSE ENTREGA.DATA END) AS ENTREGA,
+(CASE WHEN PRE_ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE PRE_ENCERRAMENTO.DATA END) AS PRE_ENCERRAMENTO,
+(CASE WHEN ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE ENCERRAMENTO.DATA END) AS ENCERRAMENTO,
+(CASE WHEN FATURAMENTO.DATA = '1999-01-01' THEN NULL ELSE FATURAMENTO.DATA END) AS FATURAMENTO,
+(CASE WHEN REC_DOCUMENTOS.DATA = '1999-01-01' THEN NULL ELSE REC_DOCUMENTOS.DATA END) AS REC_DOCUMENTOS
+
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ABERTURA ON (ABERTURA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ABERTURA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS SOLICITACAO ON (SOLICITACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_SOLICITACAO_NUM)
+LEFT OUTER JOIN DIM_TEMPO AS ETA ON (ETA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ETA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS ATRACACAO ON (ATRACACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ATRACACAO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS DESOVA ON (DESOVA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_DESOVA)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBBLORIG ON (RECEBBLORIG.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEB_BL_ORIG)
+LEFT OUTER JOIN DIM_TEMPO AS MADEIRA_COND ON (MADEIRA_COND.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_MADEIRA_CONDENADA)
+LEFT OUTER JOIN DIM_TEMPO AS MADEIRA_LIB ON (MADEIRA_LIB.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_MADEIRA_LIBERADA)
+LEFT OUTER JOIN DIM_TEMPO AS REDESTCONTAINER ON (REDESTCONTAINER.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REDEST_CONTAINER)
+LEFT OUTER JOIN DIM_TEMPO AS LIBMAPA ON (LIBMAPA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_LIB_MAPA)
+LEFT OUTER JOIN DIM_TEMPO AS PRESENCA ON (PRESENCA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_PRESENCA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBIMENTONUM ON (RECEBIMENTONUM.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEBIMENTO_NUM)
+LEFT OUTER JOIN DIM_TEMPO AS REGISTRODTA ON (REGISTRODTA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REGISTRO_DTA)
+LEFT OUTER JOIN DIM_TEMPO AS LIBERACAODTA ON (LIBERACAODTA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_LIBERACAO_DTA)
+LEFT OUTER JOIN DIM_TEMPO AS REGISTRODI ON (REGISTRODI.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REGISTRODI_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS DESEMBARACO ON (DESEMBARACO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_DESEMBARACO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBDANF ON (RECEBDANF.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEB_DANF)
+LEFT OUTER JOIN DIM_TEMPO AS CARREGAMENTO ON (CARREGAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_CARREGAMENTO)
+LEFT OUTER JOIN DIM_TEMPO AS ENTREGA ON (ENTREGA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENTREGA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS PRE_ENCERRAMENTO ON (PRE_ENCERRAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENV_PRE_ENCER)
+LEFT OUTER JOIN DIM_TEMPO AS ENCERRAMENTO ON (ENCERRAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENCERRAMENTO)
+LEFT OUTER JOIN DIM_TEMPO AS FATURAMENTO ON (FATURAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_FATURAMENTO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS REC_DOCUMENTOS ON (REC_DOCUMENTOS.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REC_DOCUMENTOS_DTA)
+
+
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO IN ('IMP. NORMAL - MARITIMA (sem DTA) COMEXPORT',
+'IMP. NORMAL - MARITIMA (sem DTA)',
+'IMP. NORMAL - AEREA (sem DTA) COMEXPORT',
+'IMP. NORMAL - AÉREA (sem DTA)',
+'IMP. MARITIMA (DTA1)',
+'IMP. AEREA (COM DTA)',
+'IMP. MARITIMA (DTA1) COMEXPORT',
+'IMP. NORMAL - RODOVIARIA')
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+) QUERY_SEGUNDA_PARTE
+WHERE 
+(CASE WHEN QUERY_SEGUNDA_PARTE.nm_servico = 'IMP. NORMAL - RODOVIARIA' THEN 
+                                           (CASE WHEN QUERY_SEGUNDA_PARTE.nm_cliente = 'COMEXPORT TRADING COMERCIO EXTERIOR LTDA ' THEN 1 ELSE 2 END)
+	  ELSE '2' END) = '2';
+
+
+Eventos:
+load 
+fk_processo,
+nm_eventos
+
+;
+sql
+
+SELECT
+fk_processo,
+FK AS nm_eventos
+FROM (
+----------------------------------------------------------------------------------------------------------------------------------------
+SELECT FK_PROCESSO, CAST('SOLICITAÇÃO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_SOLICITACAO_NUM = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('ETA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_ETA_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('ATRACAÇÃO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_ATRACACAO_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('DESOVA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_DESOVA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('RECEB. BL ORIG.' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_RECEB_BL_ORIG = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('REDEST. CONTAINER' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_REDEST_CONTAINER = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('LIB. MAPA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_LIB_MAPA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('PRESENCA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_PRESENCA_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('RECEBIMENTO NUMERARIO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_RECEBIMENTO_NUM = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('REGISTRO DA DI' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_REGISTRODI_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('DESEMBARAÇO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_DESEMBARACO_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('RECEB. DANF' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_RECEB_DANF = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('CARREGAMENTO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_CARREGAMENTO = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('ENTREGA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_ENTREGA_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('ENCERRAMENTO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_ENCERRAMENTO = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('FATURAMENTO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_FATURAMENTO_DATA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('ENVIO PRÉ ENCERRAMENTO' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_ENV_PRE_ENCER = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('REGISTRO DTA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_REGISTRO_DTA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('LIBERAÇÃO DTA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_LIBERACAO_DTA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('MADEIRA CONDENADA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_MADEIRA_CONDENADA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('MADEIRA LIBERADA' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_MADEIRA_LIBERADA = '13150'
+UNION ALL 
+SELECT FK_PROCESSO, CAST('REC DOCUMENTOS ORIGINAIS / OUTROS' AS VARCHAR(15)) AS FK FROM FATO_FOLLOWUP_EVENTOS WHERE FK_REC_DOCUMENTOS_DTA = '13150'
+----------------------------------------------------------------------------------------------------------------------------------------
+) QUERY 
+ORDER BY FK_PROCESSO,FK;
+
+
+
+
+
+
+Cores:
+load 
+fk_processo,
+IF(null_x_ok='1', '1', 
+If(null_x_ok='2', '2', 
+If(null_x_ok='3', '3', 
+))) as null_x_ok1,
+IF(null_x_ok='1', 'VERDE', 
+If(null_x_ok='2', 'AMARELO',
+If(null_x_ok='3', 'VERMELHO', 
+))) as null_x_ok
+
+;
+sql
+SELECT distinct
+QUERY_SEGUNDA_PARTE.fk_processo,
+QUERY_SEGUNDA_PARTE.null_x_ok
+FROM (
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+-- SOLICITACAO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.SOLICITACAO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+														CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ABERTURA <= '2' THEN '1' -- Verde  
+															WHEN QUERY_PRIMEIRA_PARTE.DIA_ABERTURA <= '5' THEN '2' -- Amarelo 
+															WHEN QUERY_PRIMEIRA_PARTE.DIA_ABERTURA >= '6' THEN '3' -- Vermelho 
+															ELSE NULL -- Nulo  
+														END
+							ELSE NULL END
+	ELSE NULL
+END	) AS NULL_X_OK
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+DIM_PROCESSO.NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ABERTURA.DATA = '1999-01-01' THEN NULL ELSE ABERTURA.DATA END), GETDATE()) AS DIA_ABERTURA,
+(CASE WHEN SOLICITACAO.DATA = '1999-01-01' THEN NULL ELSE SOLICITACAO.DATA END) AS SOLICITACAO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ABERTURA ON (ABERTURA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ABERTURA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS SOLICITACAO ON (SOLICITACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_SOLICITACAO_NUM)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN SOLICITACAO.DATA = '1999-01-01' THEN NULL ELSE SOLICITACAO.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ABERTURA IS NOT NULL
+
+
+UNION ALL 
+
+-- ETA
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ETA IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO <= '3' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO >= '4' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END
+	ELSE NULL 
+END	) AS NULL_X_OK
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+DIM_PROCESSO.NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN SOLICITACAO.DATA = '1999-01-01' THEN NULL ELSE SOLICITACAO.DATA END), GETDATE()) AS DIA_SOLICITACAO,
+(CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END) AS ETA
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS SOLICITACAO ON (SOLICITACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_SOLICITACAO_NUM)
+LEFT OUTER JOIN DIM_TEMPO AS ETA ON (ETA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ETA_DATA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_SOLICITACAO IS NOT NULL
+
+
+UNION ALL 
+
+-- ATRACACAO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ATRACACAO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '3' THEN '2' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '4' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+DIM_PROCESSO.NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END), GETDATE()) AS DIA_ETA,
+(CASE WHEN ATRACACAO.DATA = '1999-01-01' THEN NULL ELSE ATRACACAO.DATA END) AS ATRACACAO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ETA ON (ETA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ETA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS ATRACACAO ON (ATRACACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ATRACACAO_DATA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN ATRACACAO.DATA = '1999-01-01' THEN NULL ELSE ATRACACAO.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ETA IS NOT NULL
+
+
+UNION ALL 
+
+-- DESOVA
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.DESOVA IS NULL THEN
+      CASE WHEN QUERY_PRIMEIRA_PARTE.TP_ESTUFAGEM = 'FCL' THEN NULL 
+           ELSE             CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '3' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '4' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '5' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END	
+	   END													
+	ELSE NULL
+END	) AS NULL_X_OK
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+(CASE WHEN DIM_PROCESSO.TP_ESTUFAGEM = '.' THEN NULL ELSE DIM_PROCESSO.TP_ESTUFAGEM END) AS TP_ESTUFAGEM,
+DATEDIFF(DAY, (CASE WHEN ATRACACAO.DATA = '1999-01-01' THEN NULL ELSE ATRACACAO.DATA END), GETDATE()) AS DIA_ATRACACAO,
+(CASE WHEN DESOVA.DATA = '1999-01-01' THEN NULL ELSE DESOVA.DATA END) AS DESOVA
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ATRACACAO ON (ATRACACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ATRACACAO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS DESOVA ON (DESOVA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_DESOVA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN DESOVA.DATA = '1999-01-01' THEN NULL ELSE DESOVA.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE 
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.DESOVA IS NULL THEN
+      CASE WHEN QUERY_PRIMEIRA_PARTE.TP_ESTUFAGEM = 'FCL' THEN NULL 
+           ELSE             CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '3' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '4' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '5' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END	
+	   END													
+	ELSE NULL
+END	) IS NOT NULL
+
+
+UNION ALL 
+
+-- BL ORIGINAL
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.BL_ORIG IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '3' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '4' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END), GETDATE()) AS DIA_ETA,
+(CASE WHEN RECEBBLORIG.DATA = '1999-01-01' THEN NULL ELSE RECEBBLORIG.DATA END) AS BL_ORIG
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ETA ON (ETA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ETA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBBLORIG ON (RECEBBLORIG.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEB_BL_ORIG)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN RECEBBLORIG.DATA = '1999-01-01' THEN NULL ELSE RECEBBLORIG.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ETA IS NOT NULL
+
+
+UNION ALL 
+
+-- REDEST CONTAINER
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.REDEST_CONTAINER IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '-3' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '-2' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '-1' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END), GETDATE()) AS DIA_ETA,
+(CASE WHEN REDESTCONTAINER.DATA = '1999-01-01' THEN NULL ELSE REDESTCONTAINER.DATA END) AS REDEST_CONTAINER
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ETA ON (ETA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ETA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS REDESTCONTAINER ON (REDESTCONTAINER.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REDEST_CONTAINER)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN REDESTCONTAINER.DATA = '1999-01-01' THEN NULL ELSE REDESTCONTAINER.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ETA IS NOT NULL
+
+
+UNION ALL 
+
+-- LIB MAPA
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.LIB_MAPA IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '3' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA <= '4' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ETA >= '5' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                         END 
+							ELSE NULL END														 
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ETA.DATA = '1999-01-01' THEN NULL ELSE ETA.DATA END), GETDATE()) AS DIA_ETA,
+(CASE WHEN LIBMAPA.DATA = '1999-01-01' THEN NULL ELSE LIBMAPA.DATA END) AS LIB_MAPA
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ETA ON (ETA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ETA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS LIBMAPA ON (LIBMAPA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_LIB_MAPA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN LIBMAPA.DATA = '1999-01-01' THEN NULL ELSE LIBMAPA.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ETA IS NOT NULL
+
+
+UNION ALL 
+
+-- PRESENCA
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.PRESENCA IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '3' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO <= '4' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO >= '5' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ATRACACAO.DATA = '1999-01-01' THEN NULL ELSE ATRACACAO.DATA END), GETDATE()) AS DIA_ATRACACAO,
+(CASE WHEN PRESENCA.DATA = '1999-01-01' THEN NULL ELSE PRESENCA.DATA END) AS PRESENCA
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ATRACACAO ON (ATRACACAO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ATRACACAO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS PRESENCA ON (PRESENCA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_PRESENCA_DATA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN PRESENCA.DATA = '1999-01-01' THEN NULL ELSE PRESENCA.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ATRACACAO IS NOT NULL
+
+
+UNION ALL 
+
+-- RECEBIMENTO NUMERARIO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.RECEBIMENTO_NUMERARIO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '2' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA >= '3' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                         END 
+							ELSE NULL END														 
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN PRESENCA.DATA = '1999-01-01' THEN NULL ELSE PRESENCA.DATA END), GETDATE()) AS DIA_PRESENCA,
+(CASE WHEN RECEBIMENTONUM.DATA = '1999-01-01' THEN NULL ELSE RECEBIMENTONUM.DATA END) AS RECEBIMENTO_NUMERARIO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS PRESENCA ON (PRESENCA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_PRESENCA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBIMENTONUM ON (RECEBIMENTONUM.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEBIMENTO_NUM)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN RECEBIMENTONUM.DATA = '1999-01-01' THEN NULL ELSE RECEBIMENTONUM.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_PRESENCA IS NOT NULL
+
+
+UNION ALL 
+
+-- REGISTRO DI
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.REGISTRODI IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA <= '2' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_PRESENCA >= '3' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN PRESENCA.DATA = '1999-01-01' THEN NULL ELSE PRESENCA.DATA END), GETDATE()) AS DIA_PRESENCA,
+(CASE WHEN REGISTRODI.DATA = '1999-01-01' THEN NULL ELSE REGISTRODI.DATA END) AS REGISTRODI
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS PRESENCA ON (PRESENCA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_PRESENCA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS REGISTRODI ON (REGISTRODI.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REGISTRODI_DATA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN REGISTRODI.DATA = '1999-01-01' THEN NULL ELSE REGISTRODI.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_PRESENCA IS NOT NULL
+
+
+UNION ALL 
+
+-- DESEMBARACO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.DESEMBARACO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_REGISTRODI <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_REGISTRODI >= '2' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN REGISTRODI.DATA = '1999-01-01' THEN NULL ELSE REGISTRODI.DATA END), GETDATE()) AS DIA_REGISTRODI,
+(CASE WHEN DESEMBARACO.DATA = '1999-01-01' THEN NULL ELSE DESEMBARACO.DATA END) AS DESEMBARACO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS DESEMBARACO ON (DESEMBARACO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_DESEMBARACO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS REGISTRODI ON (REGISTRODI.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_REGISTRODI_DATA)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN DESEMBARACO.DATA = '1999-01-01' THEN NULL ELSE DESEMBARACO.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_REGISTRODI IS NOT NULL
+
+
+UNION ALL 
+
+-- RECEB DANF
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.RECEB_DANF IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO <= '2' THEN '2' -- Amarelo 
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO >= '3' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN DESEMBARACO.DATA = '1999-01-01' THEN NULL ELSE DESEMBARACO.DATA END), GETDATE()) AS DIA_DESEMBARACO,
+(CASE WHEN RECEBDANF.DATA = '1999-01-01' THEN NULL ELSE RECEBDANF.DATA END) AS RECEB_DANF
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS DESEMBARACO ON (DESEMBARACO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_DESEMBARACO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBDANF ON (RECEBDANF.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEB_DANF)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN RECEBDANF.DATA = '1999-01-01' THEN NULL ELSE RECEBDANF.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_DESEMBARACO IS NOT NULL
+
+
+UNION ALL 
+
+-- CARREGAMENTO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.CARREGAMENTO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_RECEB_DANF <= '1' THEN '1' -- Verde   
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_RECEB_DANF >= '2' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN RECEBDANF.DATA = '1999-01-01' THEN NULL ELSE RECEBDANF.DATA END), GETDATE()) AS DIA_RECEB_DANF,
+(CASE WHEN CARREGAMENTO.DATA = '1999-01-01' THEN NULL ELSE CARREGAMENTO.DATA END) AS CARREGAMENTO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS RECEBDANF ON (RECEBDANF.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_RECEB_DANF)
+LEFT OUTER JOIN DIM_TEMPO AS CARREGAMENTO ON (CARREGAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_CARREGAMENTO)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN CARREGAMENTO.DATA = '1999-01-01' THEN NULL ELSE CARREGAMENTO.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_RECEB_DANF IS NOT NULL
+
+
+UNION ALL 
+
+-- ENTREGA
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ENTREGA IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_CARREGAMENTO <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_CARREGAMENTO >= '2' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN CARREGAMENTO.DATA = '1999-01-01' THEN NULL ELSE CARREGAMENTO.DATA END), GETDATE()) AS DIA_CARREGAMENTO,
+(CASE WHEN ENTREGA.DATA = '1999-01-01' THEN NULL ELSE ENTREGA.DATA END) AS ENTREGA
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ENTREGA ON (ENTREGA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENTREGA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS CARREGAMENTO ON (CARREGAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_CARREGAMENTO)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN ENTREGA.DATA = '1999-01-01' THEN NULL ELSE ENTREGA.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_CARREGAMENTO IS NOT NULL
+
+
+UNION ALL 
+
+-- ENCERRAMENTO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.ENCERRAMENTO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA <= '2' THEN '2' -- Amarelo 
+															 WHEN QUERY_PRIMEIRA_PARTE.DIA_ENTREGA >= '3' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END 
+							ELSE NULL END														
+	ELSE NULL
+END	) AS NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ENTREGA.DATA = '1999-01-01' THEN NULL ELSE ENTREGA.DATA END), GETDATE()) AS DIA_ENTREGA,
+(CASE WHEN ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE ENCERRAMENTO.DATA END) AS ENCERRAMENTO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS ENTREGA ON (ENTREGA.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENTREGA_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS ENCERRAMENTO ON (ENCERRAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENCERRAMENTO)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE ENCERRAMENTO.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ENTREGA IS NOT NULL
+
+
+UNION ALL 
+
+-- FATURAMENTO
+SELECT
+QUERY_PRIMEIRA_PARTE.FK_PROCESSO,
+
+(
+CASE WHEN QUERY_PRIMEIRA_PARTE.FATURAMENTO IS NULL THEN
+                            CASE WHEN QUERY_PRIMEIRA_PARTE.NM_SERVICO in ('IMP. NORMAL - MARITIMA (sem DTA)') THEN
+                                                        CASE WHEN QUERY_PRIMEIRA_PARTE.DIA_ENCERRAMENTO <= '1' THEN '1' -- Verde  
+                                                             WHEN QUERY_PRIMEIRA_PARTE.DIA_ENCERRAMENTO >= '2' THEN '3' -- Vermelho 
+                                                             ELSE NULL -- Nulo  
+                                                        END
+							ELSE NULL END														
+	ELSE NULL
+END	) NULL_X_OK
+
+FROM (
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+SELECT
+FATO_FOLLOWUP_EVENTOS.FK_PROCESSO,
+(CASE WHEN DIM_PROCESSO.NM_SERVICO = '.' THEN NULL ELSE DIM_PROCESSO.NM_SERVICO END) AS NM_SERVICO,
+DATEDIFF(DAY, (CASE WHEN ENCERRAMENTO.DATA = '1999-01-01' THEN NULL ELSE ENCERRAMENTO.DATA END), GETDATE()) AS DIA_ENCERRAMENTO,
+(CASE WHEN FATURAMENTO.DATA = '1999-01-01' THEN NULL ELSE FATURAMENTO.DATA END) AS FATURAMENTO
+
+FROM FATO_FOLLOWUP_EVENTOS
+LEFT OUTER JOIN DIM_PROCESSO ON (DIM_PROCESSO.SK_PROCESSO = FATO_FOLLOWUP_EVENTOS.FK_PROCESSO)
+LEFT OUTER JOIN DIM_TEMPO AS FATURAMENTO ON (FATURAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_FATURAMENTO_DATA)
+LEFT OUTER JOIN DIM_TEMPO AS ENCERRAMENTO ON (ENCERRAMENTO.SK_TEMPO = FATO_FOLLOWUP_EVENTOS.FK_ENCERRAMENTO)
+WHERE DIM_PROCESSO.NR_PROCESSO LIKE 'IM%'
+AND DIM_PROCESSO.NM_SERVICO = 'IMP. NORMAL - MARITIMA (sem DTA)'
+AND (CASE WHEN FATURAMENTO.DATA = '1999-01-01' THEN NULL ELSE FATURAMENTO.DATA END) IS NULL
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+) QUERY_PRIMEIRA_PARTE
+WHERE QUERY_PRIMEIRA_PARTE.DIA_ENCERRAMENTO IS NOT NULL
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+)QUERY_SEGUNDA_PARTE 
+WHERE QUERY_SEGUNDA_PARTE.fk_processo NOT IN (
+
+
+SELECT
+SK_PROCESSO
+FROM(
+SELECT SK_PROCESSO FROM DIM_PROCESSO WHERE NM_CLIENTE LIKE '%COMEXPORT%' UNION ALL
+SELECT SK_PROCESSO FROM DIM_PROCESSO WHERE NM_CLIENTE LIKE '%IMERYS%' UNION ALL
+SELECT SK_PROCESSO FROM DIM_PROCESSO WHERE NM_CLIENTE LIKE '%NWT%' UNION ALL
+SELECT SK_PROCESSO FROM DIM_PROCESSO WHERE NM_CLIENTE LIKE '%PRODOOZE%' UNION ALL
+SELECT SK_PROCESSO FROM DIM_PROCESSO WHERE NM_CLIENTE LIKE '%VOLVO%'
+) QUERY
+
+
+)ORDER BY FK_PROCESSO, NULL_X_OK
+;
